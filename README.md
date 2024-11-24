@@ -1,6 +1,6 @@
 ## **College Appointment System API Documentation**
 
-# **College Appointment System API works, which allows students and professors to manage appointments efficiently. Whether you're a student trying to book an appointment with a professor, or a professor managing your availability, this system has you covered.**
+**College Appointment System API works, which allows students and professors to manage appointments efficiently. Whether you're a student trying to book an appointment with a professor, or a professor managing your availability, this system has you covered.**
 
 ### **Base URL**
 `http://localhost:3000`
