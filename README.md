@@ -1,7 +1,3 @@
-Here’s the updated **College Appointment System API Documentation** that includes the **Appointment Status Management** feature as per your request:
-
----
-
 ## **College Appointment System API Documentation**
 
 ### **Base URL**
@@ -301,4 +297,6 @@ Here’s the updated **College Appointment System API Documentation** that inclu
 
 ---
 
-This is the updated API documentation, which now includes the **Appointment Status Management** feature. The professors can confirm appointments, and students can mark appointments as completed. You can also manage the status with a `PATCH` request.
+recent updates: 
+
+1. This is the updated API documentation, which now includes the **Appointment Status Management** feature. The professors can confirm appointments, and students can mark appointments as completed. You can also manage the status with a `PATCH` request.
