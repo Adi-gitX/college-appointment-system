@@ -1,0 +1,37 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  email    String   @unique
+  password String
+  role     String   // "student" or "professor"
+  appointments Appointment[] @relation("UserAppointments")
+  professorAppointments Appointment[] @relation("ProfessorAppointments")
+  availabilities Availability[]
+}
+
+model Appointment {
+  id          Int      @id @default(autoincrement())
+  time        String
+  professor   User     @relation("ProfessorAppointments", fields: [professorId], references: [id])
+  professorId Int
+  student     User     @relation("UserAppointments", fields: [studentId], references: [id])
+  studentId   Int
+  isCancelled Boolean  @default(false)
+}
+
+model Availability {
+  id          Int    @id @default(autoincrement())
+  professor   User   @relation(fields: [professorId], references: [id])
+  professorId Int
+  time        String
+}
+
+
