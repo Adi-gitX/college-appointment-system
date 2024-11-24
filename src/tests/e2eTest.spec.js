@@ -4,39 +4,48 @@ const app = require('../app');
 describe('E2E Test', () => {
     let studentToken, professorToken, appointmentId;
 
+    const professorCredentials = { email: 'prof@college.com', password: '1234', role: 'professor' };
+    const studentCredentials = { email: 'stud@college.com', password: '1234', role: 'student' };
+    const availabilityTime = '10:00 AM';
+
     test('Complete user flow', async () => {
         // Signup and login for professor
-        await request(app).post('/auth/signup').send({ email: 'prof@college.com', password: '1234', role: 'professor' });
-        const professorLogin = await request(app).post('/auth/login').send({ email: 'prof@college.com', password: '1234' });
+        await request(app).post('/auth/signup').send(professorCredentials);
+        const professorLogin = await request(app).post('/auth/login').send(professorCredentials);
         professorToken = professorLogin.body.token;
+        expect(professorToken).toBeDefined();
 
         // Professor adds availability
-        await request(app)
+        const availabilityResponse = await request(app)
             .post('/availability')
-            .send({ time: '10:00 AM' })
+            .send({ time: availabilityTime })
             .set('Authorization', `Bearer ${professorToken}`);
+        expect(availabilityResponse.status).toBe(200);
 
         // Signup and login for student
-        await request(app).post('/auth/signup').send({ email: 'stud@college.com', password: '1234', role: 'student' });
-        const studentLogin = await request(app).post('/auth/login').send({ email: 'stud@college.com', password: '1234' });
+        await request(app).post('/auth/signup').send(studentCredentials);
+        const studentLogin = await request(app).post('/auth/login').send(studentCredentials);
         studentToken = studentLogin.body.token;
+        expect(studentToken).toBeDefined();
 
         // Student books appointment
-        const appointment = await request(app)
+        const appointmentResponse = await request(app)
             .post('/appointments')
-            .send({ professorId: 1, time: '10:00 AM' })
+            .send({ professorId: 1, time: availabilityTime })
             .set('Authorization', `Bearer ${studentToken}`);
-        appointmentId = appointment.body.appointment.id;
+        appointmentId = appointmentResponse.body.appointment.id;
+        expect(appointmentId).toBeDefined();
 
         // Professor cancels appointment
-        await request(app)
+        const cancelResponse = await request(app)
             .delete(`/appointments/${appointmentId}`)
             .set('Authorization', `Bearer ${professorToken}`);
+        expect(cancelResponse.status).toBe(200);
 
         // Student checks appointments
-        const appointments = await request(app)
+        const appointmentsResponse = await request(app)
             .get('/appointments')
             .set('Authorization', `Bearer ${studentToken}`);
-        expect(appointments.body.appointments.length).toBe(0);
+        expect(appointmentsResponse.body.appointments.length).toBe(0);
     });
 });

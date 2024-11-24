@@ -1,6 +1,11 @@
-# **College Appointment System API Documentation**
+Here’s the updated **College Appointment System API Documentation** that includes the **Appointment Status Management** feature as per your request:
 
-This API allows students to book appointments with professors, and professors to manage their availability. Below are the endpoints and workflows for using the system.
+---
+
+## **College Appointment System API Documentation**
+
+### **Base URL**
+`http://localhost:3000`
 
 ---
 
@@ -14,19 +19,25 @@ This API allows students to book appointments with professors, and professors to
   **Request Body**:
   ```json
   {
-    "email": "professor1@college.com",
+    "email": "user@example.com",
     "password": "password123",
-    "role": "professor"
+    "role": "professor" // or "student"
   }
   ```
-  or
+
+  **Response**:
   ```json
   {
-    "email": "student1@college.com",
-    "password": "password123",
-    "role": "student"
+    "message": "User registered successfully",
+    "user": {
+      "id": 1,
+      "email": "user@example.com",
+      "role": "professor"
+    }
   }
   ```
+
+---
 
 #### **Login**
 - **POST** `/auth/login`
@@ -34,7 +45,7 @@ This API allows students to book appointments with professors, and professors to
   **Request Body**:
   ```json
   {
-    "email": "professor1@college.com",
+    "email": "user@example.com",
     "password": "password123"
   }
   ```
@@ -42,11 +53,15 @@ This API allows students to book appointments with professors, and professors to
   **Response**:
   ```json
   {
-    "token": "JWT-TOKEN"
+    "message": "Login successful",
+    "token": "JWT-TOKEN",
+    "user": {
+      "id": 1,
+      "email": "user@example.com",
+      "role": "professor"
+    }
   }
   ```
-
-  Save the returned JWT token for authorization in future requests.
 
 ---
 
@@ -69,6 +84,19 @@ This API allows students to book appointments with professors, and professors to
   }
   ```
 
+  **Response**:
+  ```json
+  {
+    "message": "Availability added successfully",
+    "availability": {
+      "id": 1,
+      "time": "10:00 AM"
+    }
+  }
+  ```
+
+---
+
 #### **Get Availability**
 - **GET** `/availability/:professorId`
 
@@ -79,8 +107,21 @@ This API allows students to book appointments with professors, and professors to
   }
   ```
 
-  **Path Parameter**:
-  - `professorId`: ID of the professor (can be obtained after signup/login).
+  **Response**:
+  ```json
+  {
+    "availability": [
+      {
+        "id": 1,
+        "time": "10:00 AM"
+      },
+      {
+        "id": 2,
+        "time": "11:00 AM"
+      }
+    ]
+  }
+  ```
 
 ---
 
@@ -104,8 +145,24 @@ This API allows students to book appointments with professors, and professors to
   }
   ```
 
-#### **Get Appointments (Student)**
-- **GET** `/appointments`
+  **Response**:
+  ```json
+  {
+    "message": "Appointment booked successfully",
+    "appointment": {
+      "id": 1,
+      "studentId": 2,
+      "professorId": 1,
+      "time": "10:00 AM",
+      "status": "pending"
+    }
+  }
+  ```
+
+---
+
+#### **Get Student's Appointments**
+- **GET** `/appointments/student`
 
   **Headers**:
   ```json
@@ -114,7 +171,49 @@ This API allows students to book appointments with professors, and professors to
   }
   ```
 
-#### **Cancel Appointment (Professor)**
+  **Response**:
+  ```json
+  {
+    "appointments": [
+      {
+        "id": 1,
+        "professorId": 1,
+        "time": "10:00 AM",
+        "status": "pending"
+      }
+    ]
+  }
+  ```
+
+---
+
+#### **Get Professor's Appointments**
+- **GET** `/appointments/professor`
+
+  **Headers**:
+  ```json
+  {
+    "Authorization": "Bearer <JWT-TOKEN>"
+  }
+  ```
+
+  **Response**:
+  ```json
+  {
+    "appointments": [
+      {
+        "id": 1,
+        "studentId": 2,
+        "time": "10:00 AM",
+        "status": "pending"
+      }
+    ]
+  }
+  ```
+
+---
+
+#### **Cancel Appointment**
 - **DELETE** `/appointments/:appointmentId`
 
   **Headers**:
@@ -124,44 +223,82 @@ This API allows students to book appointments with professors, and professors to
   }
   ```
 
-  **Path Parameter**:
-  - `appointmentId`: ID of the appointment to be canceled (can be obtained after booking).
+  **Response**:
+  ```json
+  {
+    "message": "Appointment canceled successfully"
+  }
+  ```
 
 ---
 
-## **Postman Testing Workflow**
+#### **Appointment Status Management**
+- **PATCH** `/appointments/:appointmentId/status`
 
-### **Step 1: Signup Users**
-1. Signup as a **Professor** using the `/auth/signup` endpoint.
-2. Signup as a **Student** using the same endpoint.
+  **Headers**:
+  ```json
+  {
+    "Authorization": "Bearer <JWT-TOKEN>"
+  }
+  ```
 
-### **Step 2: Login Users**
-1. Login as a **Professor** to get a JWT token.
-2. Login as a **Student** to get a separate JWT token.
+  **Request Body**:
+  ```json
+  {
+    "status": "confirmed" // or "completed", "pending", "canceled"
+  }
+  ```
 
-### **Step 3: Professor Adds Availability**
-1. Use the `/availability` **POST** endpoint.
-2. Include the Professor's JWT token in the `Authorization` header.
-3. Provide the availability time (e.g., `"10:00 AM"`).
+  **Response**:
+  ```json
+  {
+    "message": "Appointment status updated successfully",
+    "appointment": {
+      "id": 1,
+      "status": "confirmed"
+    }
+  }
+  ```
 
-### **Step 4: Student Views Availability**
-1. Use the `/availability/:professorId` **GET** endpoint.
-2. Replace `:professorId` with the Professor's ID.
-3. Include the Student's JWT token in the `Authorization` header.
+---
 
-### **Step 5: Student Books Appointment**
-1. Use the `/appointments` **POST** endpoint.
-2. Include the Student's JWT token in the `Authorization` header.
-3. Provide the Professor's ID and time in the request body.
+### **Postman Testing Workflow**
 
-### **Step 6: Professor Cancels Appointment**
-1. Use the `/appointments/:appointmentId` **DELETE** endpoint.
-2. Replace `:appointmentId` with the Appointment's ID.
-3. Include the Professor's JWT token in the `Authorization` header.
+1. **Signup Users**
+   - Use `/auth/signup` to create both **Professor** and **Student** accounts.
 
-### **Step 7: Student Checks Appointments**
-1. Use the `/appointments` **GET** endpoint.
-2. Include the Student's JWT token in the `Authorization` header.
+2. **Login Users**
+   - Use `/auth/login` to retrieve tokens for both Professor and Student.
 
+3. **Add Professor Availability**
+   - Use `/availability` to add availability for the professor. Make sure to include the **Professor's JWT token**.
 
+4. **View Professor Availability**
+   - Use `/availability/:professorId` to fetch availability for the professor. Include the **Student's JWT token**.
 
+5. **Book Appointment**
+   - Use `/appointments` to book an appointment as a student. Provide the **Professor's ID** and the desired time.
+
+6. **Check Appointments**
+   - **For Students**: Use `/appointments/student` to view the student’s appointments.
+   - **For Professors**: Use `/appointments/professor` to view the professor’s appointments.
+
+7. **Cancel Appointment**
+   - Use `/appointments/:appointmentId` to cancel an appointment as a professor.
+
+8. **Update Appointment Status**
+   - **For Professors**: Use `/appointments/:appointmentId/status` to mark an appointment as "confirmed."
+   - **For Students**: Use `/appointments/:appointmentId/status` to mark the appointment as "completed" after attending.
+
+---
+
+### **Explanation of Appointment Statuses**
+
+- **Pending**: The appointment has been booked but is waiting for confirmation by the professor.
+- **Confirmed**: The professor has confirmed the appointment.
+- **Completed**: The student has attended the appointment and marks it as completed.
+- **Canceled**: The appointment has been canceled (either by the student or the professor).
+
+---
+
+This is the updated API documentation, which now includes the **Appointment Status Management** feature. The professors can confirm appointments, and students can mark appointments as completed. You can also manage the status with a `PATCH` request.

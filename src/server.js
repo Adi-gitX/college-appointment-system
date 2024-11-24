@@ -1,6 +1,10 @@
 const app = require('./app');
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+app.listen(PORT, (err) => {
+    if (err) {
+        console.error('Failed to start server:', err);
+    } else {
+        console.log(`Server running on http://localhost:${PORT}`);
+    }
 });

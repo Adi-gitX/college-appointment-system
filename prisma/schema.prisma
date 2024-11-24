@@ -8,10 +8,10 @@ datasource db {
 }
 
 model User {
-  id       Int      @id @default(autoincrement())
-  email    String   @unique
+  id       Int          @id @default(autoincrement())
+  email    String       @unique
   password String
-  role     String   // "student" or "professor"
+  role     String       // "student" or "professor"
   appointments Appointment[] @relation("UserAppointments")
   professorAppointments Appointment[] @relation("ProfessorAppointments")
   availabilities Availability[]
@@ -25,6 +25,7 @@ model Appointment {
   student     User     @relation("UserAppointments", fields: [studentId], references: [id])
   studentId   Int
   isCancelled Boolean  @default(false)
+  status      String   @default("waiting")
 }
 
 model Availability {
@@ -33,5 +34,3 @@ model Availability {
   professorId Int
   time        String
 }
-
-
